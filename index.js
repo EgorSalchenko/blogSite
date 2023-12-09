@@ -6,6 +6,7 @@ import { validationResult } from "express-validator";
 import UserModel from "./models/User.js";
 import bcrypt from "bcrypt";
 import User from "./models/User.js";
+import checkAuth from './utils/checkAuth.js'
 const app = express();
 
 mongoose
@@ -29,7 +30,7 @@ app.post("/auth/login", async (req, res) => {
     const user = await UserModel.findOne({ email: req.body.email }); // ищем user по email
 
     if (!user) {
-      return req.status(404).json({ // если не нашли
+      return res.status(404).json({ // если не нашли
         message: "Пользователь не найден",
       });
     }
@@ -38,7 +39,7 @@ app.post("/auth/login", async (req, res) => {
       user._doc.passwordHash //тот что в bd (нашли по email)
     );
     if (!isValidPass) {
-      return req.status(404).json({
+      return res.status(400).json({
         message: "Не верный логин или пароль",
       });
     }
@@ -109,6 +110,12 @@ app.post("/auth/register", registerValidation, async (req, res) => {
     });
   }
 });
+
+app.get('/auth/me', checkAuth, (res, req) => {
+  try{
+
+  } catch (err){ }
+})
 
 app.listen(4444, (err) => {
   if (err) {
